@@ -603,6 +603,15 @@ export function BoxPad(){
       padding:${inner_padding};
     `
   })
+  document.querySelectorAll('*[absolute-box-pad]').forEach((element:any) => {
+    var inner_padding:any = element.getAttribute('absolute-box-pad')
+    element.style = `
+      position:absolute;
+      width:calc(100% - calc(${inner_padding}) * 2);
+      height:calc(100% - calc(${inner_padding}) * 2);
+      padding:${inner_padding};
+    `
+  })
 }
 export default function Plugins(){
   InView()
