@@ -1,0 +1,23 @@
+<!--scrollabal div with banner-->
+<div app-container>
+  <!--set banner-->
+  <app-banner banner="top,80px small:1000,left,70px"></app-banner>
+  <!--main app small-->
+  <div app app-container navigation-pane>
+    <app-navigation banner="bottom,40px" navigation></app-navigation>
+    <!--navigation panes-->
+    <div panes app>
+        <div master>
+          <app-home box-pad="10px"></app-home>
+        </div>
+        <div>
+          <app-services box-pad="10px"></app-services>
+        </div>
+        <div>
+          <app-about box-pad="10px"></app-about>
+        <div>
+          <app-contact box-pad="10px"></app-contact>
+        </div>
+    </div>
+  </div>
+</div>
