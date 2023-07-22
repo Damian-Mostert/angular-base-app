@@ -16,6 +16,8 @@ export function ClickMenus(){
   /*click-menu styles*/
   *[click-menu] *[title]{cursor:pointer}
   *[click-menu] *[options].hidden{display: none}
+  *[click-drop] *[title]{cursor:pointer}
+  *[click-drop] *[options].hidden{display: none}
   `;
   document.head.appendChild(styleElement)
   var menus_listeners_array:{ title:Element|null;options:Element|null }[]=[];
@@ -31,9 +33,21 @@ export function ClickMenus(){
       else if(!menu.options?.classList?.contains('hidden'))
         menu.options?.classList.add('hidden')
   })
+  var menus_listeners_array2:any=[];
+  (document.querySelectorAll('*[click-drop]')||[]).forEach((menu:Element)=>menus_listeners_array2.push({
+    title:menu.querySelector('*[title]') as HTMLDivElement,
+    options:menu.querySelector('*[options]') as HTMLDivElement
+  }))
+  for (const menu of menus_listeners_array2)
+    menu.options?.classList.add('hidden')
+  window.addEventListener('click',(event:any)=>{
+    for (const menu of menus_listeners_array2)
+      if (menu?.title?.contains(event.target as Node) || menu?.options?.contains(event.target as Node))
+        menu.options?.classList.remove('hidden')
+  })
 }
 export function HoverMenus(){
-  const styleElement:any = document.createElement('style');;
+  const styleElement = document.createElement('style');
   styleElement.textContent = `
   /*hover-menu styles*/
   *[hover-menu] *[title]{cursor:pointer}
@@ -42,12 +56,14 @@ export function HoverMenus(){
   *[absolute-hover-menu] *[title]{cursor:pointer}
   *[absolute-hover-menu] *[options]{display: none}
   *[absolute-hover-menu]:hover *[options]{display:block}
+  *[hover-drop] *[title]{cursor:pointer}
+  *[hover-drop] *[options].hidden{display: none}
   `;
   document.head.appendChild(styleElement)
-  var menus_listeners_array:{ title:Element|null;options:Element|null }[]=[];
-  (document.querySelectorAll('*[hover-menu]')||[]).forEach((menu:Element)=>menus_listeners_array.push({
-    title:menu.querySelector('*[title]')as HTMLDivElement,
-    options:menu.querySelector('*[options]')as HTMLDivElement
+  var menus_listeners_array:any=[];
+  (document.querySelectorAll('*[hover-menu]')||[]).forEach((menu)=>menus_listeners_array.push({
+    title:menu.querySelector('*[title]'),
+    options:menu.querySelector('*[options]')
   }))
   for (const menu of menus_listeners_array){
     menu.title?.addEventListener("mouseover",() =>menu.options?.classList.remove('hidden'))
@@ -55,11 +71,20 @@ export function HoverMenus(){
   }
   window.addEventListener('click',event=>{
     for (const menu of menus_listeners_array)
-      if (menu?.title?.contains(event.target as Node) || menu?.options?.contains(event.target as Node))
+      if (menu?.title?.contains(event.target) || menu?.options?.contains(event.target))
         menu.options?.classList.remove('hidden')
       else if(!menu.options?.classList?.contains('hidden'))
         menu.options?.classList.add('hidden')
   })
+  var menus_listeners_array3:any=[];
+  (document.querySelectorAll('*[hover-drop]')||[]).forEach((menu:Element)=>menus_listeners_array3.push({
+    title:menu.querySelector('*[title]'),
+    options:menu.querySelector('*[options]')
+  }))
+  for (const menu of menus_listeners_array3){
+    menu.title?.addEventListener("mouseover",() =>menu.options?.classList.remove('hidden'))
+    menu.options?.classList.add('hidden')
+  }
 }
 enum direction{
   Up,
@@ -283,23 +308,11 @@ export function Sliders(){
   const styleElement:any = document.createElement('style');;
   styleElement.textContent = `
     *[slider] *[vertical-view]{
-      overflow-y:auto;
-      scrollbar-width: thin;
-      scrollbar-color: transparent transparent;
+      overflow-y:hidden;
     }
     *[slider] *[horozontal-view]{
-      overflow-x: auto;white-space: nowrap;
-      scrollbar-width: thin;
-      scrollbar-color: transparent transparent;
-    }
-    *[slider] *[horozontal-view]::-webkit-scrollbar,*[slider] *[vertical-view]::-webkit-scrollbar {
-      width:0;
-    }
-    *[slider] *[horozontal-view]::-webkit-scrollbar-track, *[slider] *[vertical-view]::-webkit-scrollbar-track {
-      background-color: transparent;
-    }
-    *[slider] *[horozontal-view]::-webkit-scrollbar-thumb,*[slider] *[vertical-view]::-webkit-scrollbar-thumb {
-      background-color: transparent;
+      overflow-x: hidden;
+      white-space: nowrap;
     }
     *[slider] .full-slider-view{
       width:100%;
@@ -314,12 +327,22 @@ export function Sliders(){
   document.querySelectorAll('*[slider]').forEach((element:any) => {
     const next_button:any = element?.querySelector('*[next]')
     const prev_button:any = element?.querySelector('*[prev]')
+    const indexes:any = element?.querySelector('*[indexes]')
+    var Index:number = 0
     var type = 'vertical'
     var view:any = element?.querySelector('*[vertical-view]')
     if(!view){
       view = element?.querySelector('*[horozontal-view]')
       type = 'horozontal'
     }
+    function SetIndexus(index:number){
+      Array.from(indexes?.children||[]).forEach((element:any,i:number) => {
+        console.log(element)
+        if(index == i)element.classList.add('activeIndex')
+        else element.classList.remove('activeIndex')
+      });
+    }
+    SetIndexus(0)
     view.scrollLeft = view.scrollTop = 0
     if(!view)
       throw new Error('slider requires horozontal-view or vertical-view')
@@ -329,36 +352,36 @@ export function Sliders(){
     function next_slide() {
       if (type === 'vertical') {
         TOP += view.getBoundingClientRect().height;
-        const maxScrollTop = (view.parentElement.scrollHeight - 1) * view.getBoundingClientRect().height;
-        TOP = Math.min(TOP, maxScrollTop);
+        if (TOP < 0) TOP = 0;
+        if (TOP > (view.getBoundingClientRect().height * view.children.length) - (view.getBoundingClientRect().height)) TOP = 0;
         scrollToTopSmoothly(view, TOP, 500);
         scrollToClosestElementTop(view);
-        if (TOP < 0) TOP = 0;
+        Index = TOP/view.getBoundingClientRect().height
       } else {
         LEFT += view.getBoundingClientRect().width;
-        const maxScrollLeft = (view.parentElement.scrollWidth - 1) * view.getBoundingClientRect().width;
-        LEFT = Math.min(LEFT, maxScrollLeft);
+        if (LEFT < 0) LEFT = 0;
+        if (LEFT > (view.getBoundingClientRect().width * view.children.length) - (view.getBoundingClientRect().width)) LEFT = 0;
         scrollToLeftSmoothly(view, LEFT, 500);
         scrollToClosestElementLeft(view);
-        if (LEFT < 0) LEFT = 0;
+        Index = LEFT/view.getBoundingClientRect().width
       }
+      SetIndexus(Index)
     }
     function prev_slide() {
       if (type === 'vertical') {
         TOP -= view.getBoundingClientRect().height;
-        TOP = Math.max(TOP, 0);
-        const maxScrollTop = view.getBoundingClientRect().height*(view.children.length-2);
-        TOP = Math.min(TOP, maxScrollTop);
+        if (TOP < 0) TOP = (view.getBoundingClientRect().height * view.children.length) - (view.getBoundingClientRect().height);
         scrollToTopSmoothly(view, TOP, 500);
         scrollToClosestElementTop(view);
+        Index = TOP/view.getBoundingClientRect().height
       } else {
         LEFT -= view.getBoundingClientRect().width;
-        LEFT = Math.max(LEFT, 0);
-        const maxScrollLeft = view.getBoundingClientRect().width*(view.children.length-2);
-        LEFT = Math.min(LEFT, maxScrollLeft);
+        if (LEFT < 0) LEFT = (view.getBoundingClientRect().width * view.children.length) - (view.getBoundingClientRect().width);
         scrollToLeftSmoothly(view, LEFT, 500);
         scrollToClosestElementLeft(view);
+        Index = LEFT/view.getBoundingClientRect().width
       }
+      SetIndexus(Index)
     }
 
     function handleStop(container:any) {
@@ -461,13 +484,17 @@ export function Sliders(){
       else
       handleDown(scrollContainer)
     }
-    view.addEventListener('touchstart', handleTouchStart)
-    view.addEventListener('touchmove', handleTouchMoveVertical)
-    view.addEventListener('touchend', handleTouchEnd)
-    view.addEventListener('wheel', handleScrollHorozontal)
-    view.addEventListener('touchmove', handleTouchMoveHorozontal)
-    view.addEventListener('wheel', handleScrollVertical)
-    view.addEventListener('touchmove', handleTouchMoveVertical)
+    if(element.getAttribute("wheel-nav")){
+      view.addEventListener('wheel', handleScrollVertical)
+      view.addEventListener('wheel', handleScrollHorozontal)
+    }
+    if(element.getAttribute("touch-nav")){
+      view.addEventListener('touchstart', handleTouchStart)
+      view.addEventListener('touchmove', handleTouchMoveVertical)
+      view.addEventListener('touchend', handleTouchEnd)
+      view.addEventListener('touchmove', handleTouchMoveHorozontal)
+      view.addEventListener('touchmove', handleTouchMoveVertical)
+    }
   })
 }
 export function BannerContainer(){
@@ -519,6 +546,8 @@ export function BannerContainer(){
         ${conf.align}:${conf.height};
         ${get_op(conf.align)}:calc(100% - ${conf.height});
         ${get_opi_op(conf.align)}:100%;
+        overflow-y:auto;
+        overflow-x:auto;
       `
     }
     function SetSmall(){
@@ -533,6 +562,8 @@ export function BannerContainer(){
         ${conf.small.align}:${conf.small.height};
         ${get_op(conf.small.align)}:calc(100% - ${conf.small.height});
         ${get_opi_op(conf.small.align)}:100%;
+        overflow-y:auto;
+        overflow-x:auto;
       `
     }
     function Set(){
@@ -551,10 +582,10 @@ export function NavigationPanes(){
     const children:any = Array.from(element.querySelector('*[panes]')?.children) || []
     children.master = element.querySelector('*[master]')
     Array.from(navControl.children).forEach((element:any) => {
-      if(element.getAttribute('open')){
+      if(element.getAttribute('openIndex')){
         element.addEventListener('click',()=>{
           for(let child of children)child.hidden=true
-          children[element.getAttribute('open')].hidden = false
+          children[element.getAttribute('openIndex')].hidden = false
         })
       }
       for(let child of children)child.hidden=true
