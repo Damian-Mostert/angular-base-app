@@ -535,7 +535,7 @@ export function BannerContainer(){
     if(small_c?.[1])conf.small.align = small_c?.[1]
     if(small_c?.[2])conf.small.height = small_c?.[2]
     function SetNormal(){
-      banner.style.left = banner.style.top = app.style.top = app.style.top = null
+      banner.style.bottom = banner.style.right = banner.style.left = banner.style.top = app.style.top = app.style.bottom= app.style.left = app.style.right = null
       banner.style.position = "absolute"
       banner.style[conf.align] = "0"
       banner.style[get_op(conf.align)] = conf.height
@@ -548,7 +548,7 @@ export function BannerContainer(){
       app.style.overflowY = "auto"
     }
     function SetSmall(){
-      banner.style.left = banner.style.top = app.style.top = app.style.top = null
+      banner.style.bottom = banner.style.right = banner.style.left = banner.style.top = app.style.top = app.style.bottom= app.style.left = app.style.right = null
       banner.style.position = "absolute"
       banner.style[conf.small.align] = "0"
       banner.style[get_op(conf.small.align)] = conf.small.height
