@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import Plugins from './plugins'
+import Plugins from './Plugins'
 import Banner from './Banner'
 import Navigation from './Navigation';
 import Parts from "./Parts";
