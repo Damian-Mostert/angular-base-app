@@ -535,36 +535,28 @@ export function BannerContainer(){
     if(small_c?.[1])conf.small.align = small_c?.[1]
     if(small_c?.[2])conf.small.height = small_c?.[2]
     function SetNormal(){
-      banner.style = `
-        position:absolute;
-        ${conf.align}:0;
-        ${get_op(conf.align)}:${conf.height};
-        ${get_opi_op(conf.align)}:100%;
-      `
-      app.style = `
-        position:absolute;
-        ${conf.align}:${conf.height};
-        ${get_op(conf.align)}:calc(100% - ${conf.height});
-        ${get_opi_op(conf.align)}:100%;
-        overflow-y:auto;
-        overflow-x:auto;
-      `
+      banner.style.position = "absolute"
+      banner.style[conf.align] = "0"
+      banner.style[get_op(conf.align)] = conf.height
+      banner.style[get_opi_op(conf.align)] = "100%"
+      app.style.position = "absolute"
+      app.style[conf.align] = conf.height
+      app.style[get_op(conf.align)] = `calc(100% - ${conf.height})`
+      app.style[get_opi_op(conf.align)] = "100%"
+      app.style.overflowX = "auto"
+      app.style.overflowY = "auto"
     }
     function SetSmall(){
-      banner.style = `
-        position:absolute;
-        ${conf.small.align}:0;
-        ${get_op(conf.small.align)}:${conf.small.height};
-        ${get_opi_op(conf.small.align)}:100%;
-      `
-      app.style = `
-        position:absolute;
-        ${conf.small.align}:${conf.small.height};
-        ${get_op(conf.small.align)}:calc(100% - ${conf.small.height});
-        ${get_opi_op(conf.small.align)}:100%;
-        overflow-y:auto;
-        overflow-x:auto;
-      `
+      banner.style.position = "absolute"
+      banner.style[conf.small.align] = "0"
+      banner.style[get_op(conf.small.align)] = conf.small.height
+      banner.style[get_opi_op(conf.small.align)] = "100%"
+      app.style.position = "absolute"
+      app.style[conf.small.align] = conf.small.height
+      app.style[get_op(conf.small.align)] = `calc(100% - ${conf.small.height}`
+      app.style[get_opi_op(conf.small.align)] = "100%"
+      app.style.overflowX = "auto"
+      app.style.overflowY = "auto"
     }
     function Set(){
       if ((window.innerWidth <= Number(conf.small.on)))
